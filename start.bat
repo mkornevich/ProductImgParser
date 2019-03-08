@@ -1,0 +1,1 @@
+"D:\Конфигурации\Агро\parser\php\php.exe" "D:\Конфигурации\Агро\img_parser\ImgParser.php"
