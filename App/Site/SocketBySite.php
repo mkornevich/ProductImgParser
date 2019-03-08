@@ -31,14 +31,22 @@ class SocketBySite extends BaseSite
     public function getImgLinksByProductUrl($url)
     {
         $links = [];
+        $excludeLinks = [
+            'https://www.socket.by/bitrix/templates/new_designe/upload/no_photo.png',
+            'https://www.socket.by/upload/imager/58a9d36c75682fe43b0d5fc73f23a925.png',
+        ];
 
         $document = HTTP::getPQDocument($url);
 
         $images = $document->find("div.product__slider div.product__slider-item img");
 
         foreach ($images as $img){
-            $links[] = 'https://www.socket.by' . pq($img)->attr('src');
+            $link = 'https://www.socket.by' . pq($img)->attr('src');
+            if(in_array($link, $excludeLinks)) continue;
+            $links[] = $link;
         }
+
+
 
         return $links;
     }

@@ -74,10 +74,12 @@ class Main
         IO::writeLn();
         IO::writeLn(">>> start parsing " . $rowKey . " item with article " . $rowData->article . " with query " . $rowData->searchQuery);
 
-        $parseProductUrl = null;
-        $parseSite = null;
         $parseSiteName = "none";
+        $parseSite = null;
         $searchCount = 0;
+        $parseProductUrl = null;
+        $parseImgLinks = null;
+        $parseImgCount = 0;
 
         $searchSteps = [
             ['site_name' => 'e-catalog.ru', 'query' => $rowData->searchQuery],
@@ -94,7 +96,7 @@ class Main
             $query = $searchStep['query'];
 
             IO::writeLn('search products in "' . $siteName . '" by query "' . $query . '"');
-            if($query == '0') {
+            if ($query == '0') {
                 IO::write(" -> SKIPPED");
                 continue;
             }
@@ -108,31 +110,40 @@ class Main
                 $parseSiteName = $siteName;
             }
 
-            if ($searchCount == 1) break;
+            if ($searchCount == 1) {
+                IO::writeLn("get image links from " . $parseProductUrl);
+                $parseImgLinks = $parseSite->getImgLinksByProductUrl($parseProductUrl);
+                $parseImgCount = count($parseImgLinks);
+                if ($parseImgCount > 0) {
+                    IO::write(" -> OK found " . $parseImgCount . ' images');
+                    break;
+                } else {
+                    IO::write(" -> FAILED images not found");
+                    break;
+                }
+            };
 
         }
 
-        if ($parseProductUrl != null) {
-            IO::writeLn("get image links from " . $parseProductUrl);
-            $imageLinks = $parseSite->getImgLinksByProductUrl($parseProductUrl);
-            if (count($imageLinks) == 0) {
-                IO::writeLn("images not found");
-                return $rowData;
-            }
+        if ($parseImgCount > 0) {
+
             IO::writeLn("saving images");
             mkdir(data("output/" . $rowData->article));
-            foreach ($imageLinks as $key => $imageLink) {
+            foreach ($parseImgLinks as $key => $imageLink) {
                 HTTP::saveImg(data("output/" . $rowData->article . '/' . ($key + 1) . '.jpg'), $imageLink);
                 if ($key + 1 == $rowData->imgLimit) break;
             }
             IO::write(" -> OK");
+
         }
 
         $rowData->searchService = $parseSiteName;
         $rowData->searchCount = $searchCount;
-        $rowData->status = 1;
+        $rowData->status = ($parseImgCount > 0) ? 1 : 0;
 
-        if ($parseProductUrl != null) $this->handleSleep($rowKey);
+        if ($parseImgCount > 0) {
+            $this->handleSleep($rowKey);
+        }
         return $rowData;
     }
 
