@@ -118,7 +118,7 @@ class Main
                     IO::write(" -> OK found " . $parseImgCount . ' images');
                     break;
                 } else {
-                    IO::write(" -> FAILED images not found");
+                    IO::write(" -> FAIL images not found");
                     break;
                 }
             };
