@@ -119,7 +119,7 @@ class Main
                     break;
                 } else {
                     IO::write(" -> FAIL images not found");
-                    break;
+                    //break;
                 }
             };
 
