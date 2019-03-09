@@ -1,1 +1,1 @@
-"%CD%\..\parser\php\php.exe" "%CD%\ImgParser.php"
+%~dp0..\parser\php\php.exe" "%~dp0ImgParser.php"
