@@ -49,9 +49,15 @@ class Main
             try {
                 $row = $this->handleCsvRow($key, $sites, new InputRow($row))->getRowData();
             } catch (\Exception $e) {
-                IO::writeLn("ERROR IN " . $key . " ITEM");
+                IO::writeLn("==========>>>> ERROR IN " . $key . " ITEM <<<<==========");
+                IO::writeLn('=== error message ===');
                 IO::writeLn($e->getMessage());
-                IO::writeLn("END ERROR");
+                IO::writeLn('=== error file and number ===');
+                IO::writeLn('ERROR_FILE_NAME = ' . $e->getFile());
+                IO::writeLn('ERROR_FILE_LINE = ' . $e->getLine());
+                IO::writeLn('=== error stack trace ===');
+                IO::writeLn($e->getTraceAsString());
+                IO::writeLn("==========>>>> END ERROR <<<<==========");
             }
 
         }

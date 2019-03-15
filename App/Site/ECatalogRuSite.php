@@ -35,10 +35,10 @@ class ECatalogRuSite extends BaseSite
 
         $productHtml = HTTP::getPQDocument($url);
 
-        // загружаем главную
+        // загружаем главную картинку
         $imgLinks[] = "https://www.e-katalog.ru" . $productHtml->find('div.img200 img[rel="v:photo"]')->attr('src');
 
-        $productId = $productHtml->find('div.ib.toggle-off')->attr('id');
+        $productId = $productHtml->find('#menu_addto div.ib.toggle-off')->attr('id');
         $productId = mb_substr($productId, 2, mb_strlen($productId) - 2);
 
         $galleryResponse = file_get_contents('https://www.e-katalog.ru/mtools/mui_get_img_gallery.php?idg_=' . $productId . '&f_type_=IMG');
@@ -48,6 +48,8 @@ class ECatalogRuSite extends BaseSite
         $galleryResponse = mb_substr($galleryResponse, 1, mb_strlen($galleryResponse) - 2); // убираем скобки
 
         $jsonGallery = json_decode($galleryResponse, true);
+
+        if($jsonGallery['NumPhoto'] == '0') return$imgLinks;
 
         foreach ($jsonGallery['pp_images'] as $url){
             if($url[0] == '/')
