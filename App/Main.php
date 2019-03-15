@@ -82,7 +82,7 @@ class Main
 
         $parseSiteName = "none";
         $parseSite = null;
-        $searchCount = 0;
+        $productSearchCount = 0;
         $parseProductUrl = null;
         $parseImgLinks = null;
         $parseImgCount = 0;
@@ -107,16 +107,16 @@ class Main
                 continue;
             }
             $findProducts = $site->getProductsBySearchQuery($query);
-            $searchCount = count($findProducts);
-            IO::write(" - found " . $searchCount . " products");
+            $productSearchCount = count($findProducts);
+            IO::write(" - found " . $productSearchCount . " products");
 
-            if ($searchCount > 0) {
+            if ($productSearchCount > 0) {
                 $parseSite = $site;
                 $parseProductUrl = $findProducts[0]['url'];
                 $parseSiteName = $siteName;
             }
 
-            if ($searchCount == 1) {
+            if ($productSearchCount == 1) {
                 IO::writeLn("get image links from " . $parseProductUrl);
                 $parseImgLinks = $parseSite->getImgLinksByProductUrl($parseProductUrl);
                 $parseImgCount = count($parseImgLinks);
@@ -127,10 +127,14 @@ class Main
                     IO::write(" -> FAIL images not found");
                     //break;
                 }
-            };
+            }
 
         }
 
+
+
+
+        // сохранение картинок
         if ($parseImgCount > 0) {
 
             IO::writeLn("saving images");
@@ -144,7 +148,7 @@ class Main
         }
 
         $rowData->searchService = $parseSiteName;
-        $rowData->searchCount = $searchCount;
+        $rowData->searchCount = $productSearchCount;
         $rowData->status = ($parseImgCount > 0) ? 1 : 0;
 
         if ($parseImgCount > 0) {
