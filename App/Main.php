@@ -90,6 +90,15 @@ class Main
         $searchSiteNames = preg_split('/\|/', $row['in_search_order']);
 
         foreach ($searchSiteNames as $searchSiteName) {
+            if(!isset($sites[$searchSiteName])){
+                IO::writeLn(">>> SITE " . $searchSiteName . " incorrect in article " . $row['in_article']);
+                IO::writeLn(">>> FOUNT SITES:");
+                foreach ($sites as $name => $handler){
+                    IO::writeLn(">>> " . $name);
+                }
+                continue;
+            }
+
             $site = $sites[$searchSiteName];
             $query = $row['in_search_query'];
 
