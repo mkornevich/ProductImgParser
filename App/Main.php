@@ -43,11 +43,14 @@ class Main
 
         IO::clearDir(data('output'));
 
-        $inputCsv = CSV::read(data('input.csv'));
+        $inputCsv = CSV::readWithNames(data('input.csv'));
 
         foreach ($inputCsv as $key => &$row) {
             try {
-                $row = $this->handleCsvRow($key, $sites, new InputRow($row))->getRowData();
+                $row = $this->handleCsvRow($key, $sites, $row);
+
+
+
             } catch (\Exception $e) {
                 IO::writeLn("==========>>>> ERROR IN " . $key . " ITEM <<<<==========");
                 IO::writeLn('=== error message ===');
@@ -62,7 +65,7 @@ class Main
 
         }
 
-        CSV::write(data('input.csv'), $inputCsv);
+        CSV::writeWithNames(data('input.csv'), $inputCsv);
 
         IO::writeLn();
         IO::writeLn("END :)");
@@ -72,60 +75,85 @@ class Main
     /**
      * @param int $rowKey
      * @param BaseSite[] $sites
-     * @param InputRow $rowData
+     * @param InputRow $row
      * @return InputRow
      */
-    private function handleCsvRow($rowKey, $sites, $rowData)
+    private function handleCsvRow($rowKey, $sites, $row)
     {
         IO::writeLn();
-        IO::writeLn(">>> start parsing " . $rowKey . " item with article " . $rowData->article . " with query " . $rowData->searchQuery);
+        IO::writeLn(">>> start parsing " . $rowKey . " item with article " . $row['in_article'] . " with query " . $row['in_search_query']);
 
-        $parseSiteName = "none";
-        $parseSite = null;
-        $productSearchCount = 0;
-        $parseProductUrl = null;
-        $parseImgLinks = null;
-        $parseImgCount = 0;
+        $G_SiteName = "none";
+        $G_Site = null;
+        $G_ProductSearchCount = 0;
+        $G_ProductUrl = null;
+        $G_ImgLinks = [];
+        $G_ImgCount = 0;
 
-        $searchSteps = [
-            ['site_name' => 'e-catalog.ru', 'query' => $rowData->searchQuery],
-            ['site_name' => 'socket.by', 'query' => $rowData->searchQuery],
-            ['site_name' => 'onliner.by', 'query' => $rowData->searchQuery],
-            ['site_name' => 'onliner.by', 'query' => $rowData->searchQuery1],
-            ['site_name' => 'socket.by', 'query' => $rowData->searchQuery1],
-            ['site_name' => 'e-catalog.ru', 'query' => $rowData->searchQuery1],
-        ];
+        $searchSiteNames = preg_split('/\|/', $row['in_search_order']);
 
-        foreach ($searchSteps as $searchStep) {
-            $siteName = $searchStep['site_name'];
-            $site = $sites[$siteName];
-            $query = $searchStep['query'];
+        foreach ($searchSiteNames as $searchSiteName) {
+            $site = $sites[$searchSiteName];
+            $query = $row['in_search_query'];
 
-            IO::writeLn('search products in "' . $siteName . '" by query "' . $query . '"');
-            if ($query == '0') {
-                IO::write(" -> SKIPPED");
-                continue;
-            }
-            $findProducts = $site->getProductsBySearchQuery($query);
-            $productSearchCount = count($findProducts);
-            IO::write(" - found " . $productSearchCount . " products");
+            if($row['in_onliner_id'] != '0' && $searchSiteName == 'onliner.by'){
 
-            if ($productSearchCount > 0) {
-                $parseSite = $site;
-                $parseProductUrl = $findProducts[0]['url'];
-                $parseSiteName = $siteName;
-            }
+                IO::writeLn('search product in "' . $searchSiteName . '" by onliner_id "' . $row['in_onliner_id'] . '"');
 
-            if ($productSearchCount == 1) {
-                IO::writeLn("get image links from " . $parseProductUrl);
-                $parseImgLinks = $parseSite->getImgLinksByProductUrl($parseProductUrl);
-                $parseImgCount = count($parseImgLinks);
-                if ($parseImgCount > 0) {
-                    IO::write(" -> OK found " . $parseImgCount . ' images');
+                try {
+                    $productJsonData = HTTP::getJSONDocument('https://catalog.api.onliner.by/products/' . $row['in_onliner_id']);
+                }catch (\Exception $e){
+                    IO::writeLn('information about onliner_id not found >>> ' . $e->getMessage());
+                    continue;
+                }
+
+                $G_Site = $site;
+                $G_ProductUrl = $productJsonData['html_url'];
+                $G_SiteName = $searchSiteName;
+                $G_ProductSearchCount = 1;
+
+                IO::writeLn("get image links from " . $G_ProductUrl);
+
+                $G_ImgLinks = $G_Site->getImgLinksByProductUrl($G_ProductUrl);
+                $G_ImgCount = count($G_ImgLinks);
+                if ($G_ImgCount > 0) {
+                    IO::write(" -> OK found " . $G_ImgCount . ' images');
                     break;
                 } else {
                     IO::write(" -> FAIL images not found");
                     //break;
+                }
+            }else {
+
+                IO::writeLn('search products in "' . $searchSiteName . '" by query "' . $query . '"');
+
+                if ($query == '0') {
+                    IO::write(" -> SKIPPED");
+                    continue;
+                }
+
+                $findProducts = $site->getProductsBySearchQuery($query);
+                $G_ProductSearchCount = count($findProducts);
+
+                IO::write(" - found " . $G_ProductSearchCount . " products");
+
+                if ($G_ProductSearchCount > 0) {
+                    $G_Site = $site;
+                    $G_ProductUrl = $findProducts[0]['url'];
+                    $G_SiteName = $searchSiteName;
+                }
+
+                if ($G_ProductSearchCount == 1) {
+                    IO::writeLn("get image links from " . $G_ProductUrl);
+                    $G_ImgLinks = $G_Site->getImgLinksByProductUrl($G_ProductUrl);
+                    $G_ImgCount = count($G_ImgLinks);
+                    if ($G_ImgCount > 0) {
+                        IO::write(" -> OK found " . $G_ImgCount . ' images');
+                        break;
+                    } else {
+                        IO::write(" -> FAIL images not found");
+                        //break;
+                    }
                 }
             }
 
@@ -134,28 +162,31 @@ class Main
 
 
 
-        // сохранение картинок
-        if ($parseImgCount > 0) {
+        $this->saveImages($G_ImgLinks, $row['in_article'], $row['in_img_limit']);
 
-            IO::writeLn("saving images");
-            mkdir(data("output/" . $rowData->article));
-            foreach ($parseImgLinks as $key => $imageLink) {
-                HTTP::saveImg(data("output/" . $rowData->article . '/' . ($key + 1) . '.jpg'), $imageLink);
-                if ($key + 1 == $rowData->imgLimit) break;
-            }
-            IO::write(" -> OK");
+        $row['out_search_site'] = $G_SiteName;
+        $row['out_search_result_count'] = $G_ProductSearchCount;
+        $row['out_status_code'] = ($G_ImgCount > 0) ? 1 : 0;
 
-        }
-
-        $rowData->searchService = $parseSiteName;
-        $rowData->searchCount = $productSearchCount;
-        $rowData->status = ($parseImgCount > 0) ? 1 : 0;
-
-        if ($parseImgCount > 0) {
+        if ($G_ImgCount > 0) {
             $this->handleSleep($rowKey);
         }
-        return $rowData;
+        return $row;
     }
+
+    private function saveImages($imageLinks, $articleId, $imgLimit){
+        if (count($imageLinks) > 0) {
+            IO::writeLn("save " . $imgLimit . " images");
+            mkdir(data("output/" . $articleId));
+            foreach ($imageLinks as $key => $imageLink) {
+                HTTP::saveImg(data("output/" . $articleId . '/' . ($key + 1) . '.jpg'), $imageLink);
+                if ($key + 1 == $imgLimit) break;
+            }
+            IO::write(" -> OK");
+        }
+    }
+
+
 
     /**
      * @return BaseSite[]

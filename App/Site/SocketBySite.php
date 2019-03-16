@@ -15,7 +15,7 @@ use App\Module\HTTP;
 class SocketBySite extends BaseSite
 {
 
-    public function getProductsBySearchQuery($query)
+    public function getProductsBySearchQuery($query, $args = [])
     {
         $products = [];
         $document = HTTP::getPQDocument('https://www.socket.by/search/?q=' . rawurlencode($query));
@@ -28,7 +28,7 @@ class SocketBySite extends BaseSite
         return $products;
     }
 
-    public function getImgLinksByProductUrl($url)
+    public function getImgLinksByProductUrl($url, $args = [])
     {
         $links = [];
         $excludeLinks = [

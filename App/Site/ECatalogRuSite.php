@@ -15,7 +15,7 @@ use App\Module\HTTP;
 class ECatalogRuSite extends BaseSite
 {
 
-    public function getProductsBySearchQuery($query)
+    public function getProductsBySearchQuery($query, $args = [])
     {
         $products = [];
         $document = HTTP::getPQDocument('https://www.e-katalog.ru/mtools/mui_qs3.php?input_dom_id_=&data_=' . rawurlencode($query));
@@ -28,7 +28,7 @@ class ECatalogRuSite extends BaseSite
         return $products;
     }
 
-    public function getImgLinksByProductUrl($url)
+    public function getImgLinksByProductUrl($url, $args = [])
     {
 
         $imgLinks = [];

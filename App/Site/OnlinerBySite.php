@@ -15,7 +15,7 @@ use App\Module\HTTP;
 class OnlinerBySite extends BaseSite
 {
 
-    public function getProductsBySearchQuery($query)
+    public function getProductsBySearchQuery($query, $args = [])
     {
         $products = [];
 
@@ -30,7 +30,7 @@ class OnlinerBySite extends BaseSite
         return $products;
     }
 
-    public function getImgLinksByProductUrl($url)
+    public function getImgLinksByProductUrl($url, $args = [])
     {
         $imgLinks = [];
         $productPage = HTTP::getPQDocument($url);

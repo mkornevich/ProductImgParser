@@ -11,7 +11,7 @@ namespace App\Base;
 
 abstract class BaseSite
 {
-    abstract public function getProductsBySearchQuery($query);
+    abstract public function getProductsBySearchQuery($query, $args = []);
 
-    abstract public function getImgLinksByProductUrl($url);
+    abstract public function getImgLinksByProductUrl($url, $args = []);
 }
