@@ -35,40 +35,37 @@ class Main
 
     public function main()
     {
-        IO::writeLn("==========================================");
-        IO::writeLn("#        img parser by mkornevich        #");
-        IO::writeLn("==========================================");
+        try {
 
-        $sites = $this->getSites();
+            IO::writeLn("==========================================");
+            IO::writeLn("#        img parser by mkornevich        #");
+            IO::writeLn("==========================================");
 
-        IO::clearDir(data('output'));
+            $sites = $this->getSites();
 
-        $inputCsv = CSV::readWithNames(data('input.csv'));
+            IO::clearDir(data('output'));
 
-        foreach ($inputCsv as $key => &$row) {
-            try {
-                $row = $this->handleCsvRow($key, $sites, $row);
+            $inputCsv = CSV::readWithNames(data('input.csv'));
 
+            foreach ($inputCsv as $key => &$row) {
+                try {
+                    $row = $this->handleCsvRow($key, $sites, $row);
 
+                } catch (\Exception $e) {
+                    $this->printError($e, $key . ' ITEM');
+                }
 
-            } catch (\Exception $e) {
-                IO::writeLn("==========>>>> ERROR IN " . $key . " ITEM <<<<==========");
-                IO::writeLn('=== error message ===');
-                IO::writeLn($e->getMessage());
-                IO::writeLn('=== error file and number ===');
-                IO::writeLn('ERROR_FILE_NAME = ' . $e->getFile());
-                IO::writeLn('ERROR_FILE_LINE = ' . $e->getLine());
-                IO::writeLn('=== error stack trace ===');
-                IO::writeLn($e->getTraceAsString());
-                IO::writeLn("==========>>>> END ERROR <<<<==========");
             }
 
+            CSV::writeWithNames(data('input.csv'), $inputCsv);
+
+            IO::writeLn();
+            IO::writeLn("END :)");
+        }catch (\Exception $e){
+            $this->printError($e, 'PARSER');
+            IO::writeLn();
+            IO::writeLn("END :(");
         }
-
-        CSV::writeWithNames(data('input.csv'), $inputCsv);
-
-        IO::writeLn();
-        IO::writeLn("END :)");
 
     }
 
@@ -172,6 +169,18 @@ class Main
             $this->handleSleep($rowKey);
         }
         return $row;
+    }
+
+    private function printError($exception, $errorIn){
+        IO::writeLn("==========>>>> ERROR IN " . $errorIn . " <<<<==========");
+        IO::writeLn('=== error message ===');
+        IO::writeLn($exception->getMessage());
+        IO::writeLn('=== error file and number ===');
+        IO::writeLn('ERROR_FILE_NAME = ' . $exception->getFile());
+        IO::writeLn('ERROR_FILE_LINE = ' . $exception->getLine());
+        IO::writeLn('=== error stack trace ===');
+        IO::writeLn($exception->getTraceAsString());
+        IO::writeLn("==========>>>> END ERROR <<<<==========");
     }
 
     private function saveImages($imageLinks, $articleId, $imgLimit){
