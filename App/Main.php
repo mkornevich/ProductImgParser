@@ -16,6 +16,7 @@ use App\Module\IO;
 use App\Site\ECatalogRuSite;
 use App\Site\OnlinerBySite;
 use App\Site\SocketBySite;
+use App\Site\TgtBySite;
 
 class Main
 {
@@ -194,7 +195,7 @@ class Main
 
     private function saveImages($imageLinks, $articleId, $imgLimit){
         if (count($imageLinks) > 0) {
-            IO::writeLn("save " . $imgLimit . " images");
+            IO::writeLn("save first " . $imgLimit . " image in " . count($imageLinks) . " images");
             mkdir(data("output/" . $articleId));
             foreach ($imageLinks as $key => $imageLink) {
                 HTTP::saveImg(data("output/" . $articleId . '/' . ($key + 1) . '.jpg'), $imageLink);
@@ -215,6 +216,7 @@ class Main
             'e-catalog.ru' => new ECatalogRuSite(),
             'socket.by' => new SocketBySite(),
             'onliner.by' => new OnlinerBySite(),
+            'tgt.by' => new TgtBySite(),
         ];
     }
 
