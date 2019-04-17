@@ -196,7 +196,10 @@ class Main
     private function saveImages($imageLinks, $articleId, $imgLimit){
         if (count($imageLinks) > 0) {
             IO::writeLn("save first " . $imgLimit . " image in " . count($imageLinks) . " images");
-            mkdir(data("output/" . $articleId));
+            
+			if(!file_exists(data("output/" . $articleId)))
+				mkdir(data("output/" . $articleId));
+			
             foreach ($imageLinks as $key => $imageLink) {
                 HTTP::saveImg(data("output/" . $articleId . '/' . ($key + 1) . '.jpg'), $imageLink);
                 if ($key + 1 == $imgLimit) break;
