@@ -13,6 +13,7 @@ use App\Base\BaseSite;
 use App\Module\CSV;
 use App\Module\HTTP;
 use App\Module\IO;
+use App\Site\CorizzaBySite;
 use App\Site\ECatalogRuSite;
 use App\Site\OnlinerBySite;
 use App\Site\SocketBySite;
@@ -36,6 +37,18 @@ class Main
 
     public function main()
     {
+
+
+
+//        $site = new CorizzaBySite();
+//
+//        //$result =  $site->getProductsBySearchQuery('133104');
+//        $result =  $site->getImgLinksByProductUrl('https://corizza.by/category/boheme/133104/');
+//
+//        var_dump($result);
+
+
+
         try {
 
             IO::writeLn("==========================================");
@@ -220,6 +233,7 @@ class Main
             'socket.by' => new SocketBySite(),
             'onliner.by' => new OnlinerBySite(),
             'tgt.by' => new TgtBySite(),
+            'corizza.by' => new CorizzaBySite(),
         ];
     }
 

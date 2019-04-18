@@ -11,6 +11,10 @@ namespace App\Module;
 
 final class HTTP
 {
+    public static function get($url){
+        return file_get_contents($url);
+    }
+
     public static function getPQDocument($url){
         $html = file_get_contents($url);
 
