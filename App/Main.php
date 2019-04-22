@@ -40,15 +40,6 @@ class Main
 
 
 
-//        $site = new CorizzaBySite();
-//
-//        //$result =  $site->getProductsBySearchQuery('133104');
-//        $result =  $site->getImgLinksByProductUrl('https://corizza.by/category/boheme/133104/');
-//
-//        var_dump($result);
-
-
-
         try {
 
             IO::writeLn("==========================================");
@@ -182,7 +173,7 @@ class Main
 
 
 
-        $this->saveImages($G_ImgLinks, $row['in_article'], $row['in_img_limit']);
+        $this->saveImages($G_ImgLinks, $row['in_article'], $row['in_img_limit'], $row['in_img_min_size']);
 
         $row['out_search_site'] = $G_SiteName;
         $row['out_search_result_count'] = $G_ProductSearchCount;
@@ -206,16 +197,27 @@ class Main
         IO::writeLn("==========>>>> END ERROR <<<<==========");
     }
 
-    private function saveImages($imageLinks, $articleId, $imgLimit){
+    private function saveImages($imageLinks, $articleId, $imgLimit, $imgMinSize){
         if (count($imageLinks) > 0) {
             IO::writeLn("save first " . $imgLimit . " image in " . count($imageLinks) . " images");
             
 			if(!file_exists(data("output/" . $articleId)))
 				mkdir(data("output/" . $articleId));
-			
+
+			$offset = 0;
+
             foreach ($imageLinks as $key => $imageLink) {
-                HTTP::saveImg(data("output/" . $articleId . '/' . ($key + 1) . '.jpg'), $imageLink);
-                if ($key + 1 == $imgLimit) break;
+
+                $index = $key + 1 + $offset;
+
+                $imgName = data("output/" . $articleId . '/' . $index . '.jpg');
+                HTTP::saveImg($imgName, $imageLink);
+                $imgSize = filesize($imgName);
+                if($imgSize < $imgMinSize){
+                    unlink($imgName);
+                    $offset -= 1;
+                }
+                if ($index == $imgLimit) break;
             }
             IO::write(" -> OK");
         }

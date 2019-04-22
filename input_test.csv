@@ -1,8 +1,8 @@
-in_article;in_search_query;in_onliner_id;in_search_order;in_img_limit;out_status_code;out_search_result_count;out_search_site
-1;xiaomi redmi 4x;0;e-catalog.ru|socket.by|onliner.by;4;0;10;onliner.by
-6;Смартфон Xiaomi Redmi 4X 32GB Black;0;e-catalog.ru|socket.by|onliner.by;4;1;1;onliner.by
-4;0;0;e-catalog.ru|socket.by|onliner.by;4;0;0;none
-2;Xiaomi Mi 8 Lite 4GB/64GB;0;e-catalog.ru|socket.by|onliner.by;4;0;3;onliner.by
-3;BRADEX МУРАЖКА (KZ 0010);0;e-catalog.ru|socket.by|onliner.by;4;0;0;socket.by
-10;0;p2335d;e-catalog.ru|socket.by|onliner.by;4;1;1;onliner.by
-20;"Шнур DC ""Mickey Mouse"" для блока питания ноутбука трехлепестковый 1.0м (3x0,75mm) черный";;tgt.by;4;1;1;tgt.by
+in_article;in_search_query;in_onliner_id;in_search_order;in_img_limit;out_status_code;out_search_result_count;out_search_site;in_img_min_size
+1;xiaomi redmi 4x;0;e-catalog.ru|socket.by|onliner.by;4;0;10;onliner.by;10000
+6;Смартфон Xiaomi Redmi 4X 32GB Black;0;e-catalog.ru|socket.by|onliner.by;4;1;1;onliner.by;10000
+4;0;0;e-catalog.ru|socket.by|onliner.by;4;0;0;none;10000
+2;Xiaomi Mi 8 Lite 4GB/64GB;0;e-catalog.ru|socket.by|onliner.by;4;0;3;onliner.by;10000
+3;BRADEX МУРАЖКА (KZ 0010);0;e-catalog.ru|socket.by|onliner.by;4;0;0;socket.by;10000
+10;0;p2335d;e-catalog.ru|socket.by|onliner.by;4;1;1;onliner.by;10000
+20;"Шнур DC ""Mickey Mouse"" для блока питания ноутбука трехлепестковый 1.0м (3x0,75mm) черный";;tgt.by;4;1;1;tgt.by;10000
