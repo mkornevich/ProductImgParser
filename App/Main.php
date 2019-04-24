@@ -15,7 +15,9 @@ use App\Module\HTTP;
 use App\Module\IO;
 use App\Site\CorizzaBySite;
 use App\Site\ECatalogRuSite;
+use App\Site\OboiPalitraRuSite;
 use App\Site\OnlinerBySite;
+use App\Site\SintraUaSite;
 use App\Site\SocketBySite;
 use App\Site\TgtBySite;
 
@@ -37,6 +39,29 @@ class Main
 
     public function main()
     {
+
+        $debug = false;
+        $testSite = new OboiPalitraRuSite();
+        //$searchQuery = 'Для спальни';
+        $productUrl = 'https://oboi-palitra.ru/oboi/oboi-homecolor_hc31050_25/';
+
+
+        if($debug){
+            $data = [];
+
+            if(isset($searchQuery) && $searchQuery != '')
+                $data['getProductBySearchQuery'] = $testSite->getProductsBySearchQuery($searchQuery);
+
+            if(isset($productUrl) && $productUrl != '')
+                $data['getImgLinksByProductUrl'] = $testSite->getImgLinksByProductUrl($productUrl);
+
+            var_dump($data);
+            exit;
+        }
+
+
+
+
 
 
 
@@ -236,6 +261,8 @@ class Main
             'onliner.by' => new OnlinerBySite(),
             'tgt.by' => new TgtBySite(),
             'corizza.by' => new CorizzaBySite(),
+            'oboi-palitra.ru' => new OboiPalitraRuSite(),
+            'sintra.ua' => new SintraUaSite(),
         ];
     }
 

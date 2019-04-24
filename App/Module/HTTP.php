@@ -12,11 +12,22 @@ namespace App\Module;
 final class HTTP
 {
     public static function get($url){
-        return file_get_contents($url);
+
+        $options = array(
+            'http'=>array(
+                'method'=>"GET",
+                'header'=>"User-Agent: Mozilla/5.0 (iPad; U; CPU OS 3_2 like Mac OS X; en-us) AppleWebKit/531.21.10 (KHTML, like Gecko) Version/4.0.4 Mobile/7B334b Safari/531.21.102011-10-16 20:23:10\r\n" // i.e. An iPad
+            )
+        );
+
+        $context = stream_context_create($options);
+
+
+        return file_get_contents($url, false, $context);
     }
 
     public static function getPQDocument($url){
-        $html = file_get_contents($url);
+        $html = self::get($url);
 
         libxml_use_internal_errors(true);
         $result = \phpQuery::newDocumentHTML($html);
@@ -25,10 +36,10 @@ final class HTTP
     }
 
     public static function getJSONDocument($url){
-        return json_decode(file_get_contents($url), true);
+        return json_decode(self::get($url), true);
     }
 
     public static function saveImg($saveDir, $url){
-        file_put_contents($saveDir, file_get_contents($url));
+        file_put_contents($saveDir, self::get($url));
     }
 }
