@@ -18,7 +18,7 @@ class CorizzaBySite extends BaseSite
     public function getProductsBySearchQuery($query, $args = [])
     {
         $products = [];
-        $document = HTTP::getPQDocument('https://corizza.by/search/index.php?q=' . rawurlencode($query));
+        $document = HTTP::getPQDocument('https://corizza.by/search/index.php?spell=1&q=' . rawurlencode($query));
         $links = $document->find('div.search-page div.catalog_item > a');
         foreach ($links as $link) {
             $products[] = [
